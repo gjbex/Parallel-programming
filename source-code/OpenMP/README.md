@@ -2,7 +2,8 @@
 
 ## Exercises
 
-1. [`HelloWorld`](HelloWorld/): hello world exercise for OpenMP
+1. [`HelloWorld`](HelloWorld/): hello world for OpenMP.
+1. [`Pi`](Pi/): compute by using quadrature method.
 
 
 ## Examples
