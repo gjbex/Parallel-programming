@@ -3,6 +3,7 @@
 ## Purpose
 
 Illustration of
+* race conditions
 * `omp parallel`, the `default`, `private` and `shared` clauses,
 * the functions `omp_get_thread_num()` and `omp_get_num_threads()`,
 * conditional compilation,
@@ -34,6 +35,8 @@ print their number in order.
 
 1. `hello_world_serial.c`: original serial implementation in C.
 1. `hello_world_serial.f90`: original serial implementation in Fortran.
+1. `hello_world_race_condition.c`: C implementation with a race condition.
+1. `hello_world_race_condition.f90`: Fortran implementation with a race condition.
 1. `hello_world.c`: C implementation.
 1. `hello_world.f90`: Fortran implementation.
 1. `hello_world_ordered.c`: C implementation, theads print in order.
