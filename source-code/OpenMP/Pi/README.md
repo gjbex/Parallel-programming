@@ -13,6 +13,9 @@ Illustration of
 
 ### Part 1
 
+Write an application that computes pi using a quadrature method to integrate
+the function $1/(1 + x^2)$ over the interval $\[0, 1\]$.  Avoid a race condition
+by using an `omp critical`.
 
 ### Part 2
 
@@ -20,24 +23,7 @@ Illustration of
 
 ## What is it?
 
-1. `hello_world.c`: C implementation.
-1. `hello_world.f90`: Fortran implementation.
-1. `hello_world_ordered.c`: C implementation, theads print in order.
-1. `hello_world_ordered.f90`: Fortran implementation, threads print in order.
+1. `pi_serial.c`: C implementation of the serial starting point.
+1. `pi_serial.f90`: Fortran implementation of the serial starting point.
+1. `pi_critical.c`: C implementation, uses `omp critical`.
 1. `CMakeLists.txt`: CMake file to build the applications.
-
-
-## How to build manually
-
-To build the applications without CMake, use
-```
-$ gcc  -fopenmp  hello_world.c  -o hello_world.exe
-```
-for the C version with OpenMP, or leave out the `fopenmp` flag to build
-the serial version.
-
-For the Fortran version, use
-```
-$ gfortran  -fopenmp  hello_world.c  -o hello_world.exe
-```
-Leave out the `fopenmp` flag to build the serial version.

@@ -14,10 +14,11 @@ find_package(OpenMP)
 add_executable(pi_serial_c.exe
     pi_serial.c)
 
-# if(OpenMP_C_FOUND)
-#     target_link_libraries(hello_world_c.exe PUBLIC OpenMP::OpenMP_C)
-#     target_link_libraries(hello_world_ordered_c.exe PUBLIC OpenMP::OpenMP_C)
-# endif()
+add_executable(pi_critical_c.exe
+    pi_critical.c)
+if(OpenMP_C_FOUND)
+    target_link_libraries(pi_critical_c.exe PUBLIC OpenMP::OpenMP_C)
+endif()
 
 # Fortran applications
 add_executable(pi_serial_f90.exe
