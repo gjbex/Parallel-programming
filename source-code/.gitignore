@@ -1,0 +1,9 @@
+# CMake build directories
+build/
+
+# build artifacts
+*.o
+*.mod
+*.exe
+*.so
+*.a
