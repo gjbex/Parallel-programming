@@ -2,10 +2,12 @@
 
 ## Purpose
 
-Illustration of the quite functions:
-* `omp_get_thread_num()` and
-* conditional compilation
-* environment variable `OMP_NUM_THREADS`
+Illustration of
+* `omp parallel`, the `default`, `private` and `shared` clauses,
+* the functions `omp_get_thread_num()` and `omp_get_num_threads()`,
+* conditional compilation,
+* environment variable `OMP_NUM_THREADS`,
+* `omp for` and the `ordered` clause, `omp ordered`.
 
 
 ## Goal
