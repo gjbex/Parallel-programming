@@ -24,7 +24,8 @@ endif()
 add_executable(pi_serial_f90.exe
     pi_serial.f90)
 
-# if(OpenMP_Fortran_FOUND)
-#     target_link_libraries(hello_world_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
-#     target_link_libraries(hello_world_ordered_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
-# endif()
+add_executable(pi_critical_f90.exe
+    pi_critical.f90)
+if(OpenMP_Fortran_FOUND)
+    target_link_libraries(pi_critical_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
+endif()

@@ -26,4 +26,5 @@ by using an `omp critical`.
 1. `pi_serial.c`: C implementation of the serial starting point.
 1. `pi_serial.f90`: Fortran implementation of the serial starting point.
 1. `pi_critical.c`: C implementation, uses `omp critical`.
+1. `pi_critical.f90`: Fortran implementation, uses `omp critical`.
 1. `CMakeLists.txt`: CMake file to build the applications.
