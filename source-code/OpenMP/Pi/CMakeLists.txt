@@ -14,6 +14,8 @@ find_package(OpenMP)
 add_executable(pi_serial_c.exe
     pi_serial.c)
 
+add_executable(pi_race_condition_c.exe
+    pi_race_condition.c)
 add_executable(pi_critical_c.exe
     pi_critical.c)
 add_executable(pi_bad_critical_c.exe
@@ -21,6 +23,7 @@ add_executable(pi_bad_critical_c.exe
 add_executable(pi_reduction_c.exe
     pi_reduction.c)
 if(OpenMP_C_FOUND)
+    target_link_libraries(pi_race_condition_c.exe PUBLIC OpenMP::OpenMP_C)
     target_link_libraries(pi_critical_c.exe PUBLIC OpenMP::OpenMP_C)
     target_link_libraries(pi_bad_critical_c.exe PUBLIC OpenMP::OpenMP_C)
     target_link_libraries(pi_reduction_c.exe PUBLIC OpenMP::OpenMP_C)
@@ -30,6 +33,8 @@ endif()
 add_executable(pi_serial_f90.exe
     pi_serial.f90)
 
+add_executable(pi_race_condition_f90.exe
+    pi_race_condition.f90)
 add_executable(pi_critical_f90.exe
     pi_critical.f90)
 add_executable(pi_bad_critical_f90.exe
@@ -37,6 +42,7 @@ add_executable(pi_bad_critical_f90.exe
 add_executable(pi_reduction_f90.exe
     pi_reduction.f90)
 if(OpenMP_Fortran_FOUND)
+    target_link_libraries(pi_race_condition_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
     target_link_libraries(pi_critical_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
     target_link_libraries(pi_bad_critical_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
     target_link_libraries(pi_reduction_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
