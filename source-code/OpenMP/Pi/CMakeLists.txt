@@ -18,9 +18,12 @@ add_executable(pi_critical_c.exe
     pi_critical.c)
 add_executable(pi_bad_critical_c.exe
     pi_bad_critical.c)
+add_executable(pi_reduction_c.exe
+    pi_reduction.c)
 if(OpenMP_C_FOUND)
     target_link_libraries(pi_critical_c.exe PUBLIC OpenMP::OpenMP_C)
     target_link_libraries(pi_bad_critical_c.exe PUBLIC OpenMP::OpenMP_C)
+    target_link_libraries(pi_reduction_c.exe PUBLIC OpenMP::OpenMP_C)
 endif()
 
 # Fortran applications
@@ -31,7 +34,10 @@ add_executable(pi_critical_f90.exe
     pi_critical.f90)
 add_executable(pi_bad_critical_f90.exe
     pi_bad_critical.f90)
+add_executable(pi_reduction_f90.exe
+    pi_reduction.f90)
 if(OpenMP_Fortran_FOUND)
     target_link_libraries(pi_critical_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
     target_link_libraries(pi_bad_critical_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
+    target_link_libraries(pi_reduction_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
 endif()
