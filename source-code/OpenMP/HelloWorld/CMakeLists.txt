@@ -11,6 +11,8 @@ add_compile_options(-Wall -Wextra)
 find_package(OpenMP)
 
 # C applications
+add_executable(hello_world_serial_c.exe
+    hello_world_serial.c)
 add_executable(hello_world_c.exe
     hello_world.c)
 add_executable(hello_world_ordered_c.exe
@@ -21,6 +23,8 @@ if(OpenMP_C_FOUND)
 endif()
 
 # Fortran applications
+add_executable(hello_world_serial_f90.exe
+    hello_world_serial.f90)
 add_executable(hello_world_f90.exe
     hello_world.f90)
 add_executable(hello_world_ordered_f90.exe

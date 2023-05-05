@@ -32,6 +32,8 @@ print their number in order.
 
 ## What is it?
 
+1. `hello_world_serial.c`: original serial implementation in C.
+1. `hello_world_serial.f90`: original serial implementation in Fortran.
 1. `hello_world.c`: C implementation.
 1. `hello_world.f90`: Fortran implementation.
 1. `hello_world_ordered.c`: C implementation, theads print in order.
