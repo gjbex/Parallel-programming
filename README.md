@@ -5,6 +5,8 @@ programming using OpenMP, MPI and TBB.
 
 This is material for C/C++ and Fortran.
 
+**Note: this is work in progress**
+
 ## What is it?
 
 1. `source-code`: directory that contains the source code used
