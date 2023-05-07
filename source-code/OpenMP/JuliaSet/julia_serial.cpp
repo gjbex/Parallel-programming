@@ -66,8 +66,7 @@ valarray<cmplx> z_values(const valarray<double>& x_coords,
 
 int iterate_z(cmplx z, const cmplx& c, size_t max_iters) {
     size_t n {0};
-    const complex<double> z_in {z};
-    while (abs(z) < 2.0 && n++ < max_iters)
+    while (real(z)*real(z) + imag(z)*imag(z) < 4.0 && n++ < max_iters)
         z = z*z + c;
     return n;
 }
@@ -75,9 +74,8 @@ int iterate_z(cmplx z, const cmplx& c, size_t max_iters) {
 valarray<int> iterate_zs(valarray<cmplx>& zs, const complex<double>& c,
                          size_t max_iters) {
     valarray<int> ns(zs.size());
-    size_t i {0};
-    for (auto z: zs)
-        ns[i++] = iterate_z(z, c, max_iters);
+    for (size_t i = 0; i < zs.size(); i++)
+        ns[i] = iterate_z(zs[i], c, max_iters);
     return ns;
 }
 
