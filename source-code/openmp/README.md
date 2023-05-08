@@ -24,3 +24,4 @@ Some sample code illustrating OpenMP concepts and techniques.
 1. `Tasks`: some examples of using OpenMP tasks
 1. `JuliaSet`: implementation of the Julia set ot experiment with
    loop scheduling and taskloops.
+1. `access-clauses`: illustration of various clauses that control access.
