@@ -13,10 +13,17 @@ find_package(OpenMP)
 # C applications
 add_executable(heat_serial_c.exe
     heat_serial.c)
-# if(OpenMP_C_FOUND)
-#    target_link_libraries(firstprivate.exe PUBLIC OpenMP::OpenMP_C)
-# endif()
+add_executable(heat_c.exe
+    heat.c)
+if(OpenMP_C_FOUND)
+   target_link_libraries(heat_c.exe PUBLIC OpenMP::OpenMP_C)
+endif()
 
 # Fortran applications
 add_executable(heat_serial_f90.exe
     heat_serial.f90)
+add_executable(heat_f90.exe
+    heat.f90)
+if(OpenMP_Fortran_FOUND)
+    target_link_libraries(heat_f90.exe PUBLIC OpenMP::OpenMP_Fortran)
+endif()
