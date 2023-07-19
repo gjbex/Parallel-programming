@@ -10,3 +10,5 @@ Some serial code to serve as starting points for parallel programs.
 1. `ising`: C++ implementation of the Ising model.
 1. `lennard_jones`: C++ implementation simulating a system of
    interacting particles.
+1. `brownian_motion`: C++ implementation of particle diffusion
+   in 2D.
