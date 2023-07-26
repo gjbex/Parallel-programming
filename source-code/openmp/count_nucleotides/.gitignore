@@ -1,0 +1,7 @@
+# benchmarking artefacts
+benchmark.csv
+*.png
+
+# data
+small_dna.txt
+medium_dna.txt
