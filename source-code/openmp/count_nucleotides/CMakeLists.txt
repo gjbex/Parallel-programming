@@ -13,5 +13,8 @@ endif()
 add_executable(count_nucleotides.exe count_nucleotides.cpp)
 target_link_libraries(count_nucleotides.exe PRIVATE OpenMP::OpenMP_CXX)
 
+add_executable(count_nucleotides_2.exe count_nucleotides_2.cpp)
+target_link_libraries(count_nucleotides_2.exe PRIVATE OpenMP::OpenMP_CXX)
+
 add_executable(generate_dna.exe generate_dna.cpp)
 target_link_libraries(generate_dna.exe PRIVATE Boost::program_options)
