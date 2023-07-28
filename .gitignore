@@ -2,3 +2,6 @@
 *.swp
 *~
 *.bak
+
+# direnv config file
+.envrc
