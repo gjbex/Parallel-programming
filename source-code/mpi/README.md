@@ -4,6 +4,7 @@ Interface API for distributed programming.  Examles are given for C,
 Fortran (2008).
 
 ## What is it?
+1. `exercises`: excercises for 'Parallel programming with MPI'.
 1. `HelloWorld`: most basic MPI program to show initialization, rank, size,
     and finalization.
 1. `MatrixReduce`: computing a sum of matrices in each process using
