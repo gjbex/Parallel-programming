@@ -2,3 +2,9 @@
 *.swp
 *~
 *.bak
+
+# direnv config file
+.envrc
+
+# Jupyter Lab checkpoints
+.ipynb_checkpoints/
