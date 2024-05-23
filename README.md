@@ -7,6 +7,8 @@ This is material for C/C++ and Fortran.
 
 **Note: this is work in progress**
 
+The training on MPI and OpenMP is based on material developed by Rolf Rabenseifner (HLRS).  I attended his train-the-trainer program.
+
 ## What is it?
 
 1. `source-code`: directory that contains the source code used
