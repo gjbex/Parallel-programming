@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         t_max = atoi(argv[2]);
     }
     // delta value to stop
-    const float diff_stop = 1e-5f;
+    const float diff_stop = 1e-3f;
 
     // allocate temperature matrices
     float *temp = (float *) malloc(n*n*sizeof(float));
@@ -56,9 +56,16 @@ int main(int argc, char *argv[]) {
             }
         }
         fprintf(stderr, "step %d: %f\n", t, max_diff);
+        /*
         float *tmp = temp;
         temp = prev_temp;
         prev_temp = tmp;
+        */
+        for (int i = 1; i < n - 1; i++) {
+            for (int j = 1; j < n - 1; j++) {
+                prev_temp[i*n + j] = temp[i*n + j];
+            }
+        }
         if (max_diff < diff_stop) {
             break;
         }

@@ -1,5 +1,6 @@
 #include <float.h>
 #include <math.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,10 +14,6 @@ void print_system(const float *temp, const int n) {
         }
         printf("\n");
     }
-}
-
-float max(const float a, const float b) {
-    return (a > b) ? a : b;
 }
 
 int main(int argc, char *argv[]) {
@@ -50,54 +47,45 @@ int main(int argc, char *argv[]) {
         prev_temp[i] = temp[i] = 1.0f;
     }
 
+    printf("OpenMP cancellation = %d\n", omp_get_cancellation());
     // do time steps
     float max_diff = -FLT_MAX;
     int t;
     int is_done = FALSE;
-    int max_t = t_max + 1;
-#pragma omp parallel default(none) shared(temp, prev_temp, n, t_max, max_diff, diff_stop, is_done, max_t) private(t)
-    for (t = 0; t < t_max && !is_done; t++) {
-#pragma omp single
-        {
-            max_diff = -FLT_MAX;
-        }
+#pragma omp parallel default(none) shared(temp, prev_temp, n, t_max, max_diff, diff_stop, is_done, stderr) private(t)
+    for (t = 0; t < t_max; t++) {
+        max_diff = -FLT_MAX;
         float local_diff = -FLT_MAX;
-#pragma omp for collapse(2)
+#pragma omp for reduction(max:max_diff) collapse(2)
         for (int i = 1; i < n - 1; i++) {
             for (int j = 1; j < n - 1; j++) {
                 temp[i*n + j] = 0.25*(prev_temp[(i - 1)*n + j] + prev_temp[(i + 1)*n + j] +
                         prev_temp[i*n + j - 1] + prev_temp[i*n + j + 1]);
                 float diff = fabs(temp[i*n + j] - prev_temp[i*n + j]);
-                local_diff = max(local_diff, diff);
+                if (diff > local_diff) {
+                    local_diff = diff;
+                }
             }
         }
 #pragma omp critical
-        max_diff = max(max_diff, local_diff);
-#pragma omp for collapse(2)
-        for (int i = 1; i < n - 1; i++) {
-            for (int j = 1; j < n - 1; j++) {
-                prev_temp[i*n + j] = temp[i*n + j];
-            }
+        if (local_diff > max_diff) {
+            max_diff = local_diff;
         }
-        /*
 #pragma omp single
         {
+            fprintf(stderr, "step %d: %f\n", t, max_diff);
             float *tmp = temp;
             temp = prev_temp;
             prev_temp = tmp;
-        }
-        */
-        if (t % 20 == 0) {
-#pragma omp single
             if (max_diff < diff_stop) {
-                max_t = t;
                 is_done = TRUE;
             }
         }
-#pragma omp barrier
+        if (is_done) {
+#pragma omp cancel parallel
+        }
     }
     print_system(temp, n);
-    printf("%d steps: %f\n", max_t, max_diff);
 
     // deallocate matrices
     free(temp);
