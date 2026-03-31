@@ -5,7 +5,7 @@ program heat
     real(kind=FP), parameter :: diff_stop = 1e-5_FP
     real(kind=FP), dimension(:, :), allocatable, target :: temp_data, prev_temp_data
     real(kind=FP), dimension(:, :), pointer :: temp, prev_temp, tmp
-    real(Kind=FP) :: diff, max_diff
+    real(Kind=FP) :: diff, max_diff, b_value
     integer :: t, n = 10, t_max = 5, istat, i, j
     character(len=1024) :: buffer
 
@@ -35,7 +35,8 @@ program heat
     prev_temp => prev_temp_data
 
     ! initialize temperatures
-    do j = 1, n
+    ! top edge, inner positions, bottom edge
+    do j = 2, n - 1
         temp_data(1, j) = 1.0_FP
         prev_temp_data(1, j) = 1.0_FP
         do i = 2, n
@@ -43,6 +44,14 @@ program heat
             prev_temp_data(i, j) = 0.0_FP
         end do
     end do 
+    ! left and right edges
+    do i = 1, n
+        b_value = real(n - i, kind=FP)/(n - 1)
+        temp_data(i, 1) = b_value
+        prev_temp_data(i, 1) = b_value
+        temp_data(i, n) = b_value
+        prev_temp_data(i, n) = b_value
+    end do
 
     do t = 1, t_max
         max_diff = -1e10_FP

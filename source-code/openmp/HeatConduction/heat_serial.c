@@ -35,11 +35,19 @@ int main(int argc, char *argv[]) {
     }
 
     // initialize temperatures
-    for (int i = 0; i < n*n; i++) {
-        prev_temp[i] = temp[i] = 0.0f;
+    // top edge
+    for (int j = 0; j < n; j++) {
+        prev_temp[j] = temp[j] = 1.0f;
     }
+    // inner points, including bottom edge
+    for (int i = 1; i < n; i++) {
+        for (int j = 1; j < n - 1; j++) {
+            prev_temp[i*n + j] = temp[i*n + j] = 0.0f;
+        }
+    }
+    // left and right edges
     for (int i = 0; i < n; i++) {
-        prev_temp[i] = temp[i] = 1.0f;
+        prev_temp[i*n] = prev_temp[(i + 1)*n - 1] = temp[i*n] = temp[(i + 1)*n - 1] = ((float) (n - i - 1))/(n - 1);
     }
 
     // do time steps
@@ -55,20 +63,13 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        fprintf(stderr, "step %d: %f\n", t, max_diff);
-        /*
-        float *tmp = temp;
-        temp = prev_temp;
-        prev_temp = tmp;
-        */
-        for (int i = 1; i < n - 1; i++) {
-            for (int j = 1; j < n - 1; j++) {
-                prev_temp[i*n + j] = temp[i*n + j];
-            }
-        }
+        fprintf(stderr, "step %d: %12.6f\n", t + 1, max_diff);
         if (max_diff < diff_stop) {
             break;
         }
+        float *tmp = temp;
+        temp = prev_temp;
+        prev_temp = tmp;
     }
     print_system(temp, n);
 
