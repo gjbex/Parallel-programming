@@ -2,11 +2,11 @@ program heat
 
     use, intrinsic :: iso_fortran_env, only : FP => REAL32, error_unit
     implicit none
-    real(kind=FP), parameter :: diff_stop = 1e-5_FP
+    real(kind=FP), parameter :: diff_stop = 1e-3_FP
     real(kind=FP), dimension(:, :), allocatable, target :: temp_data, prev_temp_data
     real(kind=FP), dimension(:, :), pointer :: temp, prev_temp, tmp
-    real(Kind=FP) :: diff, max_diff, local_diff
-    integer :: t, n = 10, t_max = 5, istat, i, j
+    real(kind=FP) :: diff, max_diff, b_value
+    integer :: t, n = 10, t_max = 5, istat, i, j, max_t
     character(len=1024) :: buffer
     logical :: is_done
 
@@ -36,47 +36,76 @@ program heat
     prev_temp => prev_temp_data
 
     ! initialize temperatures
-    do j = 1, n
-        temp(1, j) = 1.0_FP
-        prev_temp(1, j) = 1.0_FP
-    end do
-    !$omp parallel default(none) shared(temp, prev_temp, tmp, n, t_max, max_diff, is_done) private(t, diff, local_diff)
-    !$omp do collapse(2)
-    do j = 1, n
-        do i = 2, n
-            temp(i, j) = 0.0_FP
-            prev_temp(i, j) = 0.0_FP
-        end do
-    end do 
-    !$omp end do
-    t = 1
-    do while (t <= t_max .and. .not. is_done)
-        max_diff = -1e10_FP
-        local_diff = -1e10_FP
+    !$omp parallel default(none) shared(temp, prev_temp, n) private(i, j, b_value)
         !$omp do collapse(2)
         do j = 2, n - 1
-            do i = 2, n - 1
-                temp(i, j) = 0.25_FP*(prev_temp(i - 1, j) + prev_temp(i + 1, j) + &
-                    prev_temp(i, j - 1) + prev_temp(i, j + 1))
-                diff = abs(temp(i, j) - prev_temp(i, j))
-                local_diff = max(local_diff, diff)
+            do i = 2, n
+                temp(i, j) = 0.0_FP
+                prev_temp(i, j) = 0.0_FP
             end do
         end do
-        !$omp critical
-            max_diff = max(max_diff, local_diff)
-        !$omp end critical
+        !$omp end do
+        !$omp do
+        do j = 1, n
+            temp(1, j) = 1.0_FP
+            prev_temp(1, j) = 1.0_FP
+        end do
+        !$omp end do
+        !$omp do private(b_value)
+        do i = 1, n
+            b_value = real(n - i, kind=FP)/(n - 1)
+            temp(i, 1) = b_value
+            prev_temp(i, 1) = b_value
+            temp(i, n) = b_value
+            prev_temp(i, n) = b_value
+        end do
+        !$omp end do
+    !$omp end parallel
+
+    is_done = .false.
+    max_t = 0
+    max_diff = 0.0_FP
+    !$omp parallel default(none) shared(temp, prev_temp, tmp, n, t_max, max_diff, &
+    !$omp& max_t, is_done) private(t, i, j, diff)
+    do t = 1, t_max
         !$omp single
+            max_diff = 0.0_FP
+        !$omp end single
+
+        !$omp barrier
+        if (is_done) cycle
+
+        !$omp do collapse(2) reduction(max:max_diff)
+        do j = 2, n - 1
+            do i = 2, n - 1
+                temp(i, j) = 0.25_FP * (prev_temp(i - 1, j) &
+                    + prev_temp(i + 1, j) + prev_temp(i, j - 1) &
+                    + prev_temp(i, j + 1))
+                diff = abs(temp(i, j) - prev_temp(i, j))
+                if (diff > max_diff) then
+                    max_diff = diff
+                end if
+            end do
+        end do
+        !$omp end do
+
+        !$omp single
+            max_t = t
             write (unit=error_unit, fmt='(A, I0, A, F12.6)') 'step ', t, ': ', max_diff
-            if (max_diff < diff_stop) is_done = .true.
+            if (max_diff < diff_stop) then
+                is_done = .true.
+            end if
             tmp => temp
             temp => prev_temp
             prev_temp => tmp
         !$omp end single
-        t = t + 1
+
+        !$omp barrier
     end do
     !$omp end parallel
 
-    call print_system(temp)
+    call print_system(prev_temp)
+    write (*, '(I0, A, F8.6)') max_t, ' steps: ', max_diff
 
     ! deallocate matrices
     deallocate(temp_data)

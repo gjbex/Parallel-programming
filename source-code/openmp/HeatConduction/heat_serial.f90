@@ -2,11 +2,11 @@ program heat
 
     use, intrinsic :: iso_fortran_env, only : FP => REAL32, error_unit
     implicit none
-    real(kind=FP), parameter :: diff_stop = 1e-5_FP
+    real(kind=FP), parameter :: diff_stop = 1e-3_FP
     real(kind=FP), dimension(:, :), allocatable, target :: temp_data, prev_temp_data
     real(kind=FP), dimension(:, :), pointer :: temp, prev_temp, tmp
     real(Kind=FP) :: diff, max_diff, b_value
-    integer :: t, n = 10, t_max = 5, istat, i, j
+    integer :: t, n = 10, t_max = 5, istat, i, j, max_t
     character(len=1024) :: buffer
 
     ! get command line arguments
@@ -53,6 +53,8 @@ program heat
         prev_temp_data(i, n) = b_value
     end do
 
+    max_t = 0
+    max_diff = 0.0_FP
     do t = 1, t_max
         max_diff = -1e10_FP
         do j = 2, n - 1
@@ -65,14 +67,16 @@ program heat
                 end if
             end do
         end do
+        max_t = t
         write (unit=error_unit, fmt='(A, I0, A, F12.6)') 'step ', t, ': ', max_diff
-        if (max_diff < diff_stop) exit
         tmp => temp
         temp => prev_temp
         prev_temp => tmp
+        if (max_diff < diff_stop) exit
     end do
 
-    call print_system(temp)
+    call print_system(prev_temp)
+    write (*, '(I0, A, F8.6)') max_t, ' steps: ', max_diff
 
     ! deallocate matrices
     deallocate(temp_data)
