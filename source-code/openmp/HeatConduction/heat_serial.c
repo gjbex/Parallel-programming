@@ -6,49 +6,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-enum {
-    DEFAULT_GRID_SIZE = 10,
-    DEFAULT_MAX_STEPS = 5,
-    MIN_GRID_SIZE = 2,
-    MIN_MAX_STEPS = 1
-};
+static void print_system(const float *temp, int n);
 
-static void print_usage(const char *program);
-static int parse_positive_int(const char *value,
-                              const char *option_name,
-                              int min_value,
-                              int *result);
-static int parse_command_line_arguments(int argc,
-                                        char *argv[],
-                                        int *n,
-                                        int *t_max,
-                                        int *print_solution);
-
-void print_system(const float *temp, const int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%12.6f", temp[i*n + j]);
-        }
-        printf("\n");
-    }
-}
-
-int main(int argc, char *argv[]) {
-    // dimension of the grid
-    int n = DEFAULT_GRID_SIZE;
-    // maximum number of time steps
-    int t_max = DEFAULT_MAX_STEPS;
-    int print_solution = 0;
-
-    const int parse_status = parse_command_line_arguments(argc,
-                                                          argv,
-                                                          &n,
-                                                          &t_max,
-                                                          &print_solution);
-    if (parse_status != 2) {
-        return parse_status;
-    }
-
+static int run_simulation(const int n,
+                          const int t_max,
+                          const int print_solution) {
     // delta value to stop
     const float diff_stop = 1e-3f;
 
@@ -112,6 +74,52 @@ int main(int argc, char *argv[]) {
     free(prev_temp);
 
     return 0;
+}
+
+static void print_system(const float *temp, const int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%12.6f", temp[i*n + j]);
+        }
+        printf("\n");
+    }
+}
+
+enum {
+    DEFAULT_GRID_SIZE = 10,
+    DEFAULT_MAX_STEPS = 5,
+    MIN_GRID_SIZE = 2,
+    MIN_MAX_STEPS = 1
+};
+
+static void print_usage(const char *program);
+static int parse_positive_int(const char *value,
+                              const char *option_name,
+                              int min_value,
+                              int *result);
+static int parse_command_line_arguments(int argc,
+                                        char *argv[],
+                                        int *n,
+                                        int *t_max,
+                                        int *print_solution);
+
+int main(int argc, char *argv[]) {
+    // dimension of the grid
+    int n = DEFAULT_GRID_SIZE;
+    // maximum number of time steps
+    int t_max = DEFAULT_MAX_STEPS;
+    int print_solution = 0;
+
+    const int parse_status = parse_command_line_arguments(argc,
+                                                          argv,
+                                                          &n,
+                                                          &t_max,
+                                                          &print_solution);
+    if (parse_status != 2) {
+        return parse_status;
+    }
+
+    return run_simulation(n, t_max, print_solution);
 }
 
 static void print_usage(const char *program) {
