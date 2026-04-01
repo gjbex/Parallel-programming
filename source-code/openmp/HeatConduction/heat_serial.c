@@ -45,11 +45,12 @@ static int run_simulation(const int n,
         max_diff = -FLT_MAX;
         for (int i = 1; i < n - 1; i++) {
             for (int j = 1; j < n - 1; j++) {
-                temp[i*n + j] = 0.25f * (prev_temp[(i - 1)*n + j]
-                        + prev_temp[(i + 1)*n + j]
-                        + prev_temp[i*n + j - 1]
-                        + prev_temp[i*n + j + 1]);
-                float diff = fabsf(temp[i*n + j] - prev_temp[i*n + j]);
+                int k = i*n + j;
+                temp[k] = 0.25f * (prev_temp[k - n]
+                        + prev_temp[k + n]
+                        + prev_temp[k - 1]
+                        + prev_temp[k + 1]);
+                float diff = fabsf(temp[k] - prev_temp[k]);
                 if (diff > max_diff) {
                     max_diff = diff;
                 }
