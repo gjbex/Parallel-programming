@@ -39,36 +39,32 @@ static int run_simulation(const int n,
     }
 
     // do time steps
-    int max_t = 0;
-    float max_diff = 0.0f;
     for (int t = 0; t < t_max; t++) {
-        max_diff = -FLT_MAX;
-        for (int i = 1; i < n - 1; i++) {
-            for (int j = 1; j < n - 1; j++) {
-                int k = i*n + j;
-                temp[k] = 0.25f * (prev_temp[k - n]
-                        + prev_temp[k + n]
-                        + prev_temp[k - 1]
-                        + prev_temp[k + 1]);
-                float diff = fabsf(temp[k] - prev_temp[k]);
-                if (diff > max_diff) {
-                    max_diff = diff;
+        if (t % 2 == 0) {
+            for (int i = 1; i < n - 1; i++) {
+                for (int j = 1; j < n - 1; j++) {
+                    int k = i*n + j;
+                    temp[k] = 0.25f * (prev_temp[k - n]
+                            + prev_temp[k + n]
+                            + prev_temp[k - 1]
+                            + prev_temp[k + 1]);
                 }
             }
-        }
-        max_t = t + 1;
-        fprintf(stderr, "step %d: %12.6f\n", t + 1, max_diff);
-        float *tmp = temp;
-        temp = prev_temp;
-        prev_temp = tmp;
-        if (max_diff < diff_stop) {
-            break;
+        } else {
+            for (int i = 1; i < n - 1; i++) {
+                for (int j = 1; j < n - 1; j++) {
+                    int k = i*n + j;
+                    prev_temp[k] = 0.25f * (temp[k - n]
+                            + temp[k + n]
+                            + temp[k - 1]
+                            + temp[k + 1]);
+                }
+            }
         }
     }
     if (print_solution) {
         print_system(prev_temp, n);
     }
-    printf("%d steps: %f\n", max_t, max_diff);
 
     // deallocate matrices
     free(temp);
