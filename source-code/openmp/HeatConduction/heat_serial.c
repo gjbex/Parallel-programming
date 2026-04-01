@@ -15,9 +15,10 @@ enum {
 
 static void print_usage(const char *program) {
     fprintf(stderr,
-            "Usage: %s [-n grid_size] [-t max_steps]\n"
+            "Usage: %s [-n grid_size] [-t max_steps] [-s]\n"
             "  -n grid_size  Grid dimension, integer >= %d\n"
             "  -t max_steps  Maximum number of time steps, integer >= %d\n"
+            "  -s            Print the final temperature matrix\n"
             "  -h            Show this help message\n",
             program,
             MIN_GRID_SIZE,
@@ -63,9 +64,10 @@ int main(int argc, char *argv[]) {
     int n = DEFAULT_GRID_SIZE;
     // maximum number of time steps
     int t_max = DEFAULT_MAX_STEPS;
+    int print_solution = 0;
 
     int opt = 0;
-    while ((opt = getopt(argc, argv, "hn:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "hn:t:s")) != -1) {
         switch (opt) {
             case 'h':
                 print_usage(argv[0]);
@@ -87,6 +89,9 @@ int main(int argc, char *argv[]) {
                     print_usage(argv[0]);
                     return 1;
                 }
+                break;
+            case 's':
+                print_solution = 1;
                 break;
             default:
                 print_usage(argv[0]);
@@ -154,7 +159,9 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-    print_system(prev_temp, n);
+    if (print_solution) {
+        print_system(prev_temp, n);
+    }
     printf("%d steps: %f\n", max_t, max_diff);
 
     // deallocate matrices
