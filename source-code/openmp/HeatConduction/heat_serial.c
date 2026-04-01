@@ -13,42 +13,16 @@ enum {
     MIN_MAX_STEPS = 1
 };
 
-static void print_usage(const char *program) {
-    fprintf(stderr,
-            "Usage: %s [-n grid_size] [-t max_steps] [-s]\n"
-            "  -n grid_size  Grid dimension, integer >= %d\n"
-            "  -t max_steps  Maximum number of time steps, integer >= %d\n"
-            "  -s            Print the final temperature matrix\n"
-            "  -h            Show this help message\n",
-            program,
-            MIN_GRID_SIZE,
-            MIN_MAX_STEPS);
-}
-
+static void print_usage(const char *program);
 static int parse_positive_int(const char *value,
                               const char *option_name,
-                              const int min_value,
-                              int *result) {
-    char *end_ptr = NULL;
-
-    errno = 0;
-    const long parsed_value = strtol(value, &end_ptr, 10);
-    if (errno != 0 || end_ptr == value || *end_ptr != '\0') {
-        fprintf(stderr, "error: invalid %s '%s'\n", option_name, value);
-        return 0;
-    }
-    if (parsed_value < min_value || parsed_value > INT_MAX) {
-        fprintf(stderr,
-                "error: %s must be in the range [%d, %d]\n",
-                option_name,
-                min_value,
-                INT_MAX);
-        return 0;
-    }
-
-    *result = (int) parsed_value;
-    return 1;
-}
+                              int min_value,
+                              int *result);
+static int parse_command_line_arguments(int argc,
+                                        char *argv[],
+                                        int *n,
+                                        int *t_max,
+                                        int *print_solution);
 
 void print_system(const float *temp, const int n) {
     for (int i = 0; i < n; i++) {
@@ -66,44 +40,13 @@ int main(int argc, char *argv[]) {
     int t_max = DEFAULT_MAX_STEPS;
     int print_solution = 0;
 
-    int opt = 0;
-    while ((opt = getopt(argc, argv, "hn:t:s")) != -1) {
-        switch (opt) {
-            case 'h':
-                print_usage(argv[0]);
-                return 0;
-            case 'n':
-                if (!parse_positive_int(optarg,
-                                        "grid size",
-                                        MIN_GRID_SIZE,
-                                        &n)) {
-                    print_usage(argv[0]);
-                    return 1;
-                }
-                break;
-            case 't':
-                if (!parse_positive_int(optarg,
-                                        "maximum number of time steps",
-                                        MIN_MAX_STEPS,
-                                        &t_max)) {
-                    print_usage(argv[0]);
-                    return 1;
-                }
-                break;
-            case 's':
-                print_solution = 1;
-                break;
-            default:
-                print_usage(argv[0]);
-                return 1;
-        }
-    }
-
-    if (optind < argc) {
-        fprintf(stderr, "error: unexpected positional argument '%s'\n",
-                argv[optind]);
-        print_usage(argv[0]);
-        return 1;
+    const int parse_status = parse_command_line_arguments(argc,
+                                                          argv,
+                                                          &n,
+                                                          &t_max,
+                                                          &print_solution);
+    if (parse_status != 2) {
+        return parse_status;
     }
 
     // delta value to stop
@@ -169,4 +112,90 @@ int main(int argc, char *argv[]) {
     free(prev_temp);
 
     return 0;
+}
+
+static void print_usage(const char *program) {
+    fprintf(stderr,
+            "Usage: %s [-n grid_size] [-t max_steps] [-s]\n"
+            "  -n grid_size  Grid dimension, integer >= %d\n"
+            "  -t max_steps  Maximum number of time steps, integer >= %d\n"
+            "  -s            Print the final temperature matrix\n"
+            "  -h            Show this help message\n",
+            program,
+            MIN_GRID_SIZE,
+            MIN_MAX_STEPS);
+}
+
+static int parse_positive_int(const char *value,
+                              const char *option_name,
+                              const int min_value,
+                              int *result) {
+    char *end_ptr = NULL;
+
+    errno = 0;
+    const long parsed_value = strtol(value, &end_ptr, 10);
+    if (errno != 0 || end_ptr == value || *end_ptr != '\0') {
+        fprintf(stderr, "error: invalid %s '%s'\n", option_name, value);
+        return 0;
+    }
+    if (parsed_value < min_value || parsed_value > INT_MAX) {
+        fprintf(stderr,
+                "error: %s must be in the range [%d, %d]\n",
+                option_name,
+                min_value,
+                INT_MAX);
+        return 0;
+    }
+
+    *result = (int) parsed_value;
+    return 1;
+}
+
+static int parse_command_line_arguments(int argc,
+                                        char *argv[],
+                                        int *n,
+                                        int *t_max,
+                                        int *print_solution) {
+    int opt = 0;
+
+    while ((opt = getopt(argc, argv, "hn:t:s")) != -1) {
+        switch (opt) {
+            case 'h':
+                print_usage(argv[0]);
+                return 0;
+            case 'n':
+                if (!parse_positive_int(optarg,
+                                        "grid size",
+                                        MIN_GRID_SIZE,
+                                        n)) {
+                    print_usage(argv[0]);
+                    return 1;
+                }
+                break;
+            case 't':
+                if (!parse_positive_int(optarg,
+                                        "maximum number of time steps",
+                                        MIN_MAX_STEPS,
+                                        t_max)) {
+                    print_usage(argv[0]);
+                    return 1;
+                }
+                break;
+            case 's':
+                *print_solution = 1;
+                break;
+            default:
+                print_usage(argv[0]);
+                return 1;
+        }
+    }
+
+    if (optind < argc) {
+        fprintf(stderr, "error: unexpected positional argument '%s'\n",
+                argv[optind]);
+        print_usage(argv[0]);
+        return 1;
+    }
+
+    return 2;
 }
