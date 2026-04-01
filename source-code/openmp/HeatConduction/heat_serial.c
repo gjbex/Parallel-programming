@@ -1,7 +1,53 @@
+#include <errno.h>
 #include <float.h>
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
+enum {
+    DEFAULT_GRID_SIZE = 10,
+    DEFAULT_MAX_STEPS = 5,
+    MIN_GRID_SIZE = 2,
+    MIN_MAX_STEPS = 1
+};
+
+static void print_usage(const char *program) {
+    fprintf(stderr,
+            "Usage: %s [-n grid_size] [-t max_steps]\n"
+            "  -n grid_size  Grid dimension, integer >= %d\n"
+            "  -t max_steps  Maximum number of time steps, integer >= %d\n"
+            "  -h            Show this help message\n",
+            program,
+            MIN_GRID_SIZE,
+            MIN_MAX_STEPS);
+}
+
+static int parse_positive_int(const char *value,
+                              const char *option_name,
+                              const int min_value,
+                              int *result) {
+    char *end_ptr = NULL;
+
+    errno = 0;
+    const long parsed_value = strtol(value, &end_ptr, 10);
+    if (errno != 0 || end_ptr == value || *end_ptr != '\0') {
+        fprintf(stderr, "error: invalid %s '%s'\n", option_name, value);
+        return 0;
+    }
+    if (parsed_value < min_value || parsed_value > INT_MAX) {
+        fprintf(stderr,
+                "error: %s must be in the range [%d, %d]\n",
+                option_name,
+                min_value,
+                INT_MAX);
+        return 0;
+    }
+
+    *result = (int) parsed_value;
+    return 1;
+}
 
 void print_system(const float *temp, const int n) {
     for (int i = 0; i < n; i++) {
@@ -14,15 +60,47 @@ void print_system(const float *temp, const int n) {
 
 int main(int argc, char *argv[]) {
     // dimension of the grid
-    int n = 10;
-    if (argc > 1) {
-        n = atoi(argv[1]);
-    }
+    int n = DEFAULT_GRID_SIZE;
     // maximum number of time steps
-    int t_max = 5;
-    if (argc > 2) {
-        t_max = atoi(argv[2]);
+    int t_max = DEFAULT_MAX_STEPS;
+
+    int opt = 0;
+    while ((opt = getopt(argc, argv, "hn:t:")) != -1) {
+        switch (opt) {
+            case 'h':
+                print_usage(argv[0]);
+                return 0;
+            case 'n':
+                if (!parse_positive_int(optarg,
+                                        "grid size",
+                                        MIN_GRID_SIZE,
+                                        &n)) {
+                    print_usage(argv[0]);
+                    return 1;
+                }
+                break;
+            case 't':
+                if (!parse_positive_int(optarg,
+                                        "maximum number of time steps",
+                                        MIN_MAX_STEPS,
+                                        &t_max)) {
+                    print_usage(argv[0]);
+                    return 1;
+                }
+                break;
+            default:
+                print_usage(argv[0]);
+                return 1;
+        }
     }
+
+    if (optind < argc) {
+        fprintf(stderr, "error: unexpected positional argument '%s'\n",
+                argv[optind]);
+        print_usage(argv[0]);
+        return 1;
+    }
+
     // delta value to stop
     const float diff_stop = 1e-3f;
 
