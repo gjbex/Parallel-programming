@@ -25,7 +25,7 @@ static int run_simulation(const int n,
 
 #pragma omp parallel default(none) shared(temp, prev_temp, n)
     {
-#pragma omp for collapse(2)
+#pragma omp for
         for (int i = 1; i < n; i++) {
             for (int j = 1; j < n - 1; j++) {
                 prev_temp[i * n + j] = temp[i * n + j] = 0.0f;
@@ -60,7 +60,7 @@ static int run_simulation(const int n,
             continue;
         }
 
-#pragma omp for collapse(2) reduction(max : max_diff)
+#pragma omp for reduction(max : max_diff)
         for (int i = 1; i < n - 1; i++) {
             for (int j = 1; j < n - 1; j++) {
                 temp[i * n + j] = 0.25f * (prev_temp[(i - 1) * n + j]
