@@ -15,11 +15,8 @@ add_executable(heat_serial_c.exe
     heat_serial.c)
 add_executable(heat_c.exe
     heat.c)
-add_executable(heat_cancel_c.exe
-    heat_cancel.c)
 if(OpenMP_C_FOUND)
    target_link_libraries(heat_c.exe PUBLIC OpenMP::OpenMP_C)
-   target_link_libraries(heat_cancel_c.exe PUBLIC OpenMP::OpenMP_C)
 endif()
 
 # Fortran applications
