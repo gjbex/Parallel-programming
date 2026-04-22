@@ -9,10 +9,11 @@ integer :: disp_unit
 integer(kind=MPI_ADDRESS_KIND) :: integer_size, lb, recv_buff_size, &
                                   target_disp
 integer, dimension(:), allocatable :: seed                                  
+integer, dimension(:), allocatable :: ranks
 integer, parameter :: tag = 17, target_rank = 0
 real(kind=sp) :: r, prob
 logical :: will_send
-type(MPI_Group) :: win_group
+type(MPI_Group) :: world_group, target_group, origin_group
 type(MPI_Status) :: status
 
 ! setup MPI and determine rank & size
@@ -38,20 +39,30 @@ nr_iters = 3
 ! displacement units in bytes.
 call MPI_Type_get_extent(MPI_INTEGER, lb, integer_size)
 recv_buff_size = 1*integer_size
-disp_unit = integer_size
+disp_unit = int(integer_size, kind(disp_unit))
 
 ! create a window for one-sided communication, nr_recvs acts as the
 ! receive buffer
 call MPI_Win_create(nr_recvs, recv_buff_size, disp_unit, MPI_INFO_NULL, &
                     MPI_COMM_WORLD, window)
-call MPI_Win_get_group(window, win_group)
+call MPI_Win_get_group(window, world_group)
+
+if (rank == target_rank) then
+    allocate(ranks(size - 1))
+    ranks = [(i, i = 1, size - 1)]
+    call MPI_Group_incl(world_group, size - 1, ranks, origin_group)
+else
+    allocate(ranks(1))
+    ranks(1) = target_rank
+    call MPI_Group_incl(world_group, 1, ranks, target_group)
+end if
 
 print '(A, I0)', 'group created by ', rank
 
 do iter = 1, nr_iters
     if (rank == target_rank) then
         nr_recvs = 0
-        call MPI_Win_post(win_group, 0, window)
+        call MPI_Win_post(origin_group, 0, window)
         print "(A)", "Win post done"
     end if
 
@@ -60,7 +71,9 @@ do iter = 1, nr_iters
     if (.not. MPI_ASYNC_PROTECTS_NONBLOCKING) &
         call MPI_F_SYNC_REG(nr_recvs)
     if (rank /= target_rank) then
-        call MPI_Win_start(win_group, 0, window)
+        ! note that since origin_group contains all processes (except target), all have
+        ! to call MPI_Win_start, even if they won't send, to avoid deadlock in MPI_Wait.
+        call MPI_Win_start(target_group, 0, window)
         print "(A, I0)", "Win start done by ", rank
         call random_number(r)
         will_send = r < prob 
