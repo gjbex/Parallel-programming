@@ -1,0 +1,11 @@
+name: benchmarks
+channels:
+  - conda-forge
+dependencies:
+  - pandas
+  - matplotlib
+  - hyperfine
+  - ca-certificates
+  - certifi
+  - openssl
+prefix: /home/gjb/mambaforge/envs/benchmarks
