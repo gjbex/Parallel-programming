@@ -2,6 +2,8 @@
 #include <chrono>
 #include <cmath>
 #include <complex>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <valarray>
 
@@ -36,7 +38,9 @@ int main(int argc, char *argv[]) {
     auto end_time = chrono::steady_clock::now();
     auto duration = chrono::duration_cast<my_time_t>(end_time - start_time);
     cerr << "time: " << duration.count()*1.0e-9 << " s" << endl;
-    print_results(ns);
+    const char *print_results_env = getenv("JULIA_PRINT_RESULTS");
+    if (!print_results_env || strcmp(print_results_env, "0") != 0)
+        print_results(ns);
     return 0;
 }
 

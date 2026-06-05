@@ -13,6 +13,10 @@ Each array task builds `julia_omp.exe` in node-local scratch when
 `VSC_SCRATCH_NODE` is available, runs one schedule/chunk-size pair, and writes a
 CSV file under `results/julia_omp_schedule/`.
 
+The benchmark runner sets `JULIA_PRINT_RESULTS=0` so the program times the
+kernel without spending allocation time formatting the full matrix after the
+timed section.
+
 The default target is wICE Ice Lake:
 
 - `--clusters=wice`
@@ -63,7 +67,7 @@ hpc --profile genius submit slurm/julia_omp_guided.slurm \
 Optional runtime overrides:
 
 ```bash
-export JULIA_SIZE=4096
+export JULIA_SIZE=16384
 export JULIA_WARMUPS=1
 export JULIA_RUNS=5
 ```
